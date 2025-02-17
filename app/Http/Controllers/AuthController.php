@@ -42,7 +42,7 @@ public function register(AuthRegisterRequest $request)
         ]);
     }
     Mail::to($user->email)->send(new SendSmsToEmail($user));
-    
+
     return redirect()->route('loginForm');
 }
 
@@ -68,26 +68,26 @@ public function register(AuthRegisterRequest $request)
     return view('auth.edit',compact('user','posts'));
   }
 }
-  public function update(AuthEditRequest $request, ) 
+  public function update(AuthEditRequest $request, )
   {
     $id = Auth::id();
       $user =  User::find($id);
       $requestData = $request->validated();
-  
+
       $user->name = $requestData['name'];
       $user->username = $requestData['username'];
       $user->email = $requestData['email'];
-  
+
       if (!empty($request->old_password)) {
           if (!Hash::check($request->old_password, $user->password)) {
               return redirect()->back()->with("error", "This password is incorrect");
           }
           $user->password = bcrypt($requestData['new_password']);
       }
-  
+
       $user->save();
-  
-     
+
+
       if($request->hasFile("avatar")){
         if($user->image->image_path){
             $this->deleteAvatar($user->image->image_path);
@@ -97,10 +97,10 @@ public function register(AuthRegisterRequest $request)
             'image_path'=> $uploadedAvatar
         ]);
     }
-  
+
       return redirect()->route('my.profile');
   }
-  
+
 
 
 
@@ -109,14 +109,14 @@ public function register(AuthRegisterRequest $request)
 
       Storage::disk('public')->delete($path);
   }
-  
+
 
   public function logout(Request $request)
   {
-      Auth::logout(); 
+      Auth::logout();
       $request->session()->invalidate();
       $request->session()->regenerateToken();
-      return redirect()->route('loginForm'); 
+      return redirect()->route('loginForm');
     }
     public function emailVerify(Request $request){
         $user = User::where('verification_token', $request->token)->first();
@@ -128,7 +128,7 @@ public function register(AuthRegisterRequest $request)
         $user->save();
         return redirect()->route('loginForm');
     }
-    
+
 
 public function notify(){
    $notify = Auth::user()->notifications;
@@ -143,10 +143,10 @@ public function userprofile($id) {
 }
 public function my_profile()
 {
-    $user = auth()->user(); 
+    $user = auth()->user();
 
-    $posts = $user->posts()->orderBy("created_at", "desc")->paginate(4); 
-    
+    $posts = $user->posts()->orderBy("created_at", "desc")->paginate(4);
+
     return view("auth.myprofile", compact("user", "posts"));
 }
 
